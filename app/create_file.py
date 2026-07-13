@@ -1,11 +1,9 @@
 import datetime
+import os
 import sys
-from pathlib import Path
 
 
-def main() -> None:
-    args = sys.argv[1:]
-
+def parse_args(args: list[str]) -> tuple[list[str], str | None]:
     directories: list[str] = []
     filename: str | None = None
 
@@ -24,31 +22,55 @@ def main() -> None:
         else:
             i += 1
 
-    dir_path = Path(*directories) if directories else Path(".")
-    if directories:
-        dir_path.mkdir(parents=True, exist_ok=True)
+    return directories, filename
 
+
+def collect_lines() -> list[str]:
     lines = []
     while True:
         content = input("Enter content line: ")
-        if content.strip().lower() == "stop":
+        if content == "stop":
             break
         lines.append(content)
+    return lines
 
+
+def format_content(lines: list[str]) -> str:
     timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     formatted_content = timestamp + "\n"
 
     for index, line in enumerate(lines, 1):
         formatted_content += f"{index} {line}\n"
 
-    if filename:
-        file_path = dir_path / filename if directories else Path(filename)
+    return formatted_content
 
-        if file_path.exists():
-            formatted_content = "\n" + formatted_content
 
-        with open(file_path, "a", encoding="utf-8") as f:
-            f.write(formatted_content)
+def write_file(dir_path: str, filename: str, content: str) -> None:
+    if dir_path and dir_path != ".":
+        os.makedirs(dir_path, exist_ok=True)
+
+    file_path = os.path.join(dir_path, filename) if dir_path else filename
+
+    if os.path.exists(file_path):
+        content = "\n" + content
+
+    with open(file_path, "a", encoding="utf-8") as f:
+        f.write(content)
+
+
+def main() -> None:
+    args = sys.argv[1:]
+    directories, filename = parse_args(args)
+
+    if not filename:
+        print("Error: The -f flag with a filename is required.")
+        sys.exit(1)
+
+    dir_path = os.path.sep.join(directories) if directories else "."
+
+    lines = collect_lines()
+    content = format_content(lines)
+    write_file(dir_path, filename, content)
 
 
 if __name__ == "__main__":
