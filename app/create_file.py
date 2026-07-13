@@ -46,9 +46,6 @@ def format_content(lines: list[str]) -> str:
 
 
 def write_file(dir_path: str, filename: str, content: str) -> None:
-    if dir_path and dir_path != ".":
-        os.makedirs(dir_path, exist_ok=True)
-
     file_path = os.path.join(dir_path, filename) if dir_path else filename
 
     if os.path.exists(file_path):
@@ -62,15 +59,15 @@ def main() -> None:
     args = sys.argv[1:]
     directories, filename = parse_args(args)
 
-    if not filename:
-        print("Error: The -f flag with a filename is required.")
-        sys.exit(1)
+    dir_path = ""
+    if directories:
+        dir_path = os.path.join(*directories)
+        os.makedirs(dir_path, exist_ok=True)
 
-    dir_path = os.path.sep.join(directories) if directories else "."
-
-    lines = collect_lines()
-    content = format_content(lines)
-    write_file(dir_path, filename, content)
+    if filename is not None:
+        lines = collect_lines()
+        content = format_content(lines)
+        write_file(dir_path, filename, content)
 
 
 if __name__ == "__main__":
