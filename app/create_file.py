@@ -1,6 +1,7 @@
 import datetime
 import os
 import sys
+from functools import reduce
 
 
 def parse_args(args: list[str]) -> tuple[list[str], str | None]:
@@ -61,7 +62,7 @@ def main() -> None:
 
     dir_path = ""
     if directories:
-        dir_path = os.path.join(*directories)
+        dir_path = reduce(os.path.join, directories)
         os.makedirs(dir_path, exist_ok=True)
 
     if filename is not None:
