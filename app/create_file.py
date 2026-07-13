@@ -1,12 +1,14 @@
 import datetime
 import os
 import sys
-from functools import reduce
 
 
 def parse_args(args: list[str]) -> tuple[list[str], str | None]:
     directories: list[str] = []
     filename: str | None = None
+
+    if args and args[0].endswith(".py"):
+        args = args[1:]
 
     i = 0
     while i < len(args):
@@ -57,12 +59,12 @@ def write_file(dir_path: str, filename: str, content: str) -> None:
 
 
 def main() -> None:
-    args = sys.argv[1:]
+    args = sys.argv
     directories, filename = parse_args(args)
 
     dir_path = ""
     if directories:
-        dir_path = reduce(os.path.join, directories)
+        dir_path = os.path.sep.join(directories)
         os.makedirs(dir_path, exist_ok=True)
 
     if filename is not None:
