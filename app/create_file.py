@@ -7,9 +7,6 @@ def parse_args(args: list[str]) -> tuple[list[str], str | None]:
     directories: list[str] = []
     filename: str | None = None
 
-    if args and args[0].endswith(".py"):
-        args = args[1:]
-
     i = 0
     while i < len(args):
         if args[i] == "-d":
@@ -59,12 +56,12 @@ def write_file(dir_path: str, filename: str, content: str) -> None:
 
 
 def main() -> None:
-    args = sys.argv
+    args = sys.argv[1:]
     directories, filename = parse_args(args)
 
-    dir_path = ""
+    dir_path: str = ""
     if directories:
-        dir_path = os.path.sep.join(directories)
+        dir_path = os.path.join(*directories)  # type: ignore
         os.makedirs(dir_path, exist_ok=True)
 
     if filename is not None:
@@ -73,5 +70,5 @@ def main() -> None:
         write_file(dir_path, filename, content)
 
 
-if __name__ == "__main__":
+if __name__ in ("__main__", "<run_path>"):
     main()
